@@ -1,0 +1,530 @@
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use serde_json::Value;
+use std::collections::BTreeMap;
+use std::fmt;
+
+pub type ExtraFields = BTreeMap<String, Value>;
+pub type BindingParameters = BTreeMap<String, Value>;
+
+/// a string-valued enum that preserves unknown values
+macro_rules! string_enum {
+    (
+        $(#[$enum_meta:meta])*
+        pub enum $name:ident {
+            $(
+                $variant:ident => $value:literal
+            ),* $(,)?
+        }
+    ) => {
+        $(#[$enum_meta])*
+        #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+        pub enum $name {
+            $(
+                $variant,
+            )*
+            Other(String),
+        }
+
+        impl $name {
+            pub fn as_str(&self) -> &str {
+                match self {
+                    $(
+                        Self::$variant => $value,
+                    )*
+                    Self::Other(value) => value,
+                }
+            }
+
+            pub fn is_known(&self) -> bool {
+                !matches!(self, Self::Other(_))
+            }
+        }
+
+        impl AsRef<str> for $name {
+            fn as_ref(&self) -> &str {
+                self.as_str()
+            }
+        }
+
+        impl fmt::Display for $name {
+            fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                f.write_str(self.as_str())
+            }
+        }
+
+        impl Serialize for $name {
+            fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+            where
+                S: Serializer,
+            {
+                serializer.serialize_str(self.as_str())
+            }
+        }
+
+        impl<'de> Deserialize<'de> for $name {
+            fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+            where
+                D: Deserializer<'de>,
+            {
+                let value = String::deserialize(deserializer)?;
+
+                Ok(match value.as_str() {
+                    $(
+                        $value => Self::$variant,
+                    )*
+                    _ => Self::Other(value),
+                })
+            }
+        }
+    };
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ActionManifest {
+    #[serde(default)]
+    pub actions: Vec<ActionDefinition>,
+
+    #[serde(default)]
+    pub action_sets: Vec<ActionSetDefinition>,
+
+    #[serde(default)]
+    pub default_bindings: Vec<DefaultBinding>,
+
+    #[serde(default)]
+    pub localization: Vec<Localization>,
+
+    #[serde(flatten)]
+    pub extra: ExtraFields,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ActionDefinition {
+    /// E.g. `/actions/main/in/jump`.
+    pub name: String,
+
+    #[serde(rename = "type")]
+    pub kind: ActionType,
+
+    #[serde(default)]
+    pub requirement: Option<ActionRequirement>,
+
+    /// present for skeleton actions
+    ///
+    /// `/skeleton/hand/left`
+    /// `/skeleton/hand/right`
+    #[serde(default)]
+    pub skeleton: Option<String>,
+
+    #[serde(flatten)]
+    pub extra: ExtraFields,
+}
+
+string_enum! {
+    pub enum ActionType {
+        Boolean => "boolean",
+        Vector1 => "vector1",
+        Vector2 => "vector2",
+        Vector3 => "vector3",
+        Pose => "pose",
+        Skeleton => "skeleton",
+        Vibration => "vibration",
+    }
+}
+
+string_enum! {
+    pub enum ActionRequirement {
+        Mandatory => "mandatory",
+        Suggested => "suggested",
+        Optional => "optional",
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ActionSetDefinition {
+    /// E.g. `/actions/main`.
+    pub name: String,
+
+    #[serde(default)]
+    pub usage: Option<ActionSetUsage>,
+
+    #[serde(flatten)]
+    pub extra: ExtraFields,
+}
+
+string_enum! {
+    pub enum ActionSetUsage {
+        Single => "single",
+        LeftRight => "leftright",
+        Hidden => "hidden",
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DefaultBinding {
+    pub controller_type: String,
+    pub binding_url: String,
+
+    #[serde(flatten)]
+    pub extra: ExtraFields,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Localization {
+    pub language_tag: String,
+
+    /// maps action/action-set paths to display names
+    #[serde(flatten)]
+    pub strings: BTreeMap<String, String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SteamVrBindingFile {
+    #[serde(default)]
+    pub action_manifest_version: Option<u32>,
+
+    #[serde(default)]
+    pub app_key: Option<String>,
+
+    pub controller_type: String,
+
+    #[serde(default)]
+    pub name: String,
+
+    #[serde(default)]
+    pub description: String,
+
+    /// key is action-set path, e.g. `/actions/main`.
+    #[serde(default)]
+    pub bindings: BTreeMap<String, ActionSetBindings>,
+
+    #[serde(default)]
+    pub category: Option<BindingCategory>,
+
+    /// usually {}, undocumented
+    #[serde(default)]
+    pub alias_info: Option<Value>,
+
+    /// generated by SteamVR
+    #[serde(default)]
+    pub options: Option<Value>,
+
+    /// formats vary, so leave this open
+    #[serde(default)]
+    pub simulated_actions: Option<Vec<Value>>,
+
+    #[serde(flatten)]
+    pub extra: ExtraFields,
+}
+
+string_enum! {
+    pub enum BindingCategory {
+        SteamVrInput => "steamvr_input",
+        Legacy => "legacy",
+    }
+}
+
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ActionSetBindings {
+    #[serde(default)]
+    pub sources: Option<Vec<SourceBinding>>,
+
+    #[serde(default)]
+    pub poses: Option<Vec<PathBinding>>,
+
+    #[serde(default)]
+    pub haptics: Option<Vec<PathBinding>>,
+
+    #[serde(default)]
+    pub skeleton: Option<Vec<PathBinding>>,
+
+    #[serde(default)]
+    pub chords: Option<Vec<ChordBinding>>,
+
+    #[serde(flatten)]
+    pub extra: ExtraFields,
+}
+
+impl ActionSetBindings {
+    pub fn sources(&self) -> &[SourceBinding] {
+        self.sources.as_deref().unwrap_or_default()
+    }
+
+    pub fn sources_mut(&mut self) -> &mut Vec<SourceBinding> {
+        self.sources.get_or_insert_with(Vec::new)
+    }
+
+    pub fn poses_mut(&mut self) -> &mut Vec<PathBinding> {
+        self.poses.get_or_insert_with(Vec::new)
+    }
+
+    pub fn haptics_mut(&mut self) -> &mut Vec<PathBinding> {
+        self.haptics.get_or_insert_with(Vec::new)
+    }
+
+    pub fn skeleton_mut(&mut self) -> &mut Vec<PathBinding> {
+        self.skeleton.get_or_insert_with(Vec::new)
+    }
+
+    pub fn chords_mut(&mut self) -> &mut Vec<ChordBinding> {
+        self.chords.get_or_insert_with(Vec::new)
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SourceBinding {
+    /// e.g. `/user/hand/left/input/trigger`.
+    pub path: String,
+
+    pub mode: BindingMode,
+
+    /// Key is mode-specific input name
+    ///
+    /// - `click`
+    /// - `touch`
+    /// - `pull`
+    /// - `position`
+    /// - `north`
+    /// - `grab`
+    #[serde(default)]
+    pub inputs: BTreeMap<BindingInput, BindingOutput>,
+
+    #[serde(default)]
+    pub parameters: Option<BindingParameters>,
+
+    #[serde(flatten)]
+    pub extra: ExtraFields,
+}
+
+impl SourceBinding {
+    pub fn parameters_mut(&mut self) -> &mut BindingParameters {
+        self.parameters.get_or_insert_with(BTreeMap::new)
+    }
+}
+
+string_enum! {
+    pub enum BindingMode {
+        Button => "button",
+        ToggleButton => "toggle_button",
+        Trigger => "trigger",
+        Joystick => "joystick",
+        Trackpad => "trackpad",
+        Dpad => "dpad",
+        Grab => "grab",
+        Scroll => "scroll",
+        ScalarConstant => "scalar_constant",
+    }
+}
+
+string_enum! {
+    pub enum BindingInput {
+        Click => "click",
+        Toggle => "toggle",
+        Touch => "touch",
+        Pull => "pull",
+        Position => "position",
+        Value => "value",
+        Force => "force",
+        Grab => "grab",
+
+        North => "north",
+        South => "south",
+        East => "east",
+        West => "west",
+        Center => "center",
+
+        X => "x",
+        Y => "y",
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BindingOutput {
+    /// destination app action
+    pub output: String,
+
+    #[serde(flatten)]
+    pub extra: ExtraFields,
+}
+
+/// used by poses, haptics, and skeleton mappings
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PathBinding {
+    /// destination app action
+    pub output: String,
+
+    /// physical source
+    pub path: String,
+
+    /// undocumented?
+    #[serde(default)]
+    pub requirement: Option<ActionRequirement>,
+
+    #[serde(flatten)]
+    pub extra: ExtraFields,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChordBinding {
+    #[serde(default)]
+    pub inputs: Vec<ChordInput>,
+
+    pub output: String,
+
+    #[serde(flatten)]
+    pub extra: ExtraFields,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChordInput(pub String, pub ChordInputKind);
+
+string_enum! {
+    pub enum ChordInputKind {
+        Held => "held",
+        Single => "single",
+        Click => "click",
+        Touch => "touch",
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InputProfile {
+    /// Normally `input_profile`.
+    pub jsonid: String,
+
+    pub controller_type: String,
+
+    #[serde(default)]
+    pub legacy_profile: Option<String>,
+
+    #[serde(default)]
+    pub legacy_binding: Option<String>,
+
+    #[serde(default)]
+    pub input_bindingui_mode: Option<BindingUiMode>,
+
+    #[serde(default)]
+    pub input_bindingui_left: Option<BindingUi>,
+
+    #[serde(default)]
+    pub input_bindingui_right: Option<BindingUi>,
+
+    /// key is profile-relative source path, e.g. `/input/trigger`
+    #[serde(default)]
+    pub input_source: BTreeMap<String, InputSourceDefinition>,
+
+    #[serde(default)]
+    pub default_bindings: Vec<ProfileDefaultBinding>,
+
+    #[serde(flatten)]
+    pub extra: ExtraFields,
+}
+
+string_enum! {
+    pub enum BindingUiMode {
+        Hmd => "hmd",
+        SingleDevice => "single_device",
+        ControllerHanded => "controller_handed",
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BindingUi {
+    pub image: String,
+
+    /// passed through as a CSS transform, e.g. scale(-1, 1)
+    #[serde(default)]
+    pub transform: Option<String>,
+
+    #[serde(flatten)]
+    pub extra: ExtraFields,
+}
+
+impl InputProfile {
+    pub fn known_controller_types<'a>(
+        profiles: &'a [(&'a str, &'a [u8])],
+    ) -> std::collections::HashSet<&'a str> {
+        profiles.iter().map(|(name, _)| *name).collect()
+    }
+
+    pub fn format_name_str(name: &str) -> String {
+        name.split('_')
+            .map(|word| {
+                let mut chars = word.chars();
+                match chars.next() {
+                    None => String::new(),
+                    Some(c) => c.to_ascii_uppercase().to_string() + chars.as_str(),
+                }
+            })
+            .collect::<Vec<_>>()
+            .join(" ")
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InputSourceDefinition {
+    #[serde(rename = "type")]
+    pub kind: InputSourceType,
+
+    #[serde(default)]
+    pub binding_image_point: Option<[f64; 2]>,
+
+    #[serde(default)]
+    pub order: Option<i32>,
+
+    #[serde(flatten)]
+    pub extra: ExtraFields,
+}
+
+string_enum! {
+    pub enum InputSourceType {
+        Button => "button",
+        Trigger => "trigger",
+        Joystick => "joystick",
+        Trackpad => "trackpad",
+        Skeleton => "skeleton",
+        Haptic => "haptic",
+        Pose => "pose",
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProfileDefaultBinding {
+    pub app_key: String,
+    pub binding_url: String,
+
+    #[serde(flatten)]
+    pub extra: ExtraFields,
+}
+
+// steamvr commonly stores values such as "0.8" and "true" as json strings
+// so use these helpers instead of accessing directly
+
+pub fn parameter_f64(parameters: &BindingParameters, name: &str) -> Option<f64> {
+    match parameters.get(name)? {
+        Value::Number(value) => value.as_f64(),
+        Value::String(value) => value.parse().ok(),
+        _ => None,
+    }
+}
+
+pub fn parameter_bool(parameters: &BindingParameters, name: &str) -> Option<bool> {
+    match parameters.get(name)? {
+        Value::Bool(value) => Some(*value),
+        Value::String(value) if value.eq_ignore_ascii_case("true") => Some(true),
+        Value::String(value) if value.eq_ignore_ascii_case("false") => Some(false),
+        _ => None,
+    }
+}
+
+pub fn set_parameter_f64(parameters: &mut BindingParameters, name: impl Into<String>, value: f64) {
+    // Match SteamVR's commonly exported representation.
+    parameters.insert(name.into(), Value::String(value.to_string()));
+}
+
+pub fn set_parameter_bool(
+    parameters: &mut BindingParameters,
+    name: impl Into<String>,
+    value: bool,
+) {
+    parameters.insert(name.into(), Value::String(value.to_string()));
+}
