@@ -1,9 +1,9 @@
 [package]
 name = "obah"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
-license = "MIT"
 repository = "https://github.com/galister/obah"
+license = "MIT"
 
 [dependencies]
 anyhow = "1"
