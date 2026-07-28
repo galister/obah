@@ -2,6 +2,7 @@
 name = "obah"
 version = "0.1.1"
 edition = "2024"
+description = "OpenVR bindings TUI for xrizer, VapoR, OpenComposite"
 repository = "https://github.com/galister/obah"
 license = "MIT"
 
