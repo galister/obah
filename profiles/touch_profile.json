@@ -1,0 +1,157 @@
+{
+  "jsonid": "input_profile",
+  "controller_type": "oculus_touch",
+  "device_class" : "TrackedDeviceClass_Controller",
+  "resource_root" : "oculus",
+  "driver_name" : "oculus",
+  "hand_priority" : -1,
+  "legacy_binding" : "{oculus}/input/legacy_bindings_touch.json",
+  "remapping" : "{oculus}/input/touch_controller_remapping.json",
+  "input_bindingui_mode" : "controller_handed",
+  "should_show_binding_errors" :  true,
+  "input_bindingui_left" :
+  {
+    "image": "{oculus}/icons/oculus_touch_left.svg"
+  },
+  "input_bindingui_right" :
+  {
+    "image": "{oculus}/icons/oculus_touch_right.svg"
+  },
+  "input_source" :
+  {
+    "/input/joystick" : {
+        "type" : "joystick",
+        "binding_image_point" : [ 54, 31 ],
+        "click" : true,
+        "touch" : true,
+        "order" : 2
+    },
+    "/input/trigger" : {
+        "type" : "trigger",
+        "binding_image_point" : [ 22, 85 ],
+        "value" : true,
+        "touch" : true,
+        "order" : 1
+    },
+    "/input/grip" : {
+        "type" : "trigger",
+        "binding_image_point" : [ 100, 86 ],
+        "value" : true,
+        "touch" : true,
+        "order" : 3
+    },
+    "/input/a" : {
+        "type" : "button",
+        "side" : "right",
+        "binding_image_point" : [ 70, 49 ],
+        "click" : true,
+        "touch" : true,
+        "order" : 4
+    },
+    "/input/b" : {
+        "type" : "button",
+        "side" : "right",
+        "binding_image_point" : [ 54, 55 ],
+        "click" : true,
+        "touch" : true,
+        "order" : 5
+    },
+    "/input/x" : {
+        "type" : "button",
+        "side" : "left",
+        "binding_image_point" : [ 70, 49 ],
+        "click" : true,
+        "touch" : true,
+        "order" : 4
+    },
+    "/input/y" : {
+        "type" : "button",
+        "side" : "left",
+        "binding_image_point" : [ 54, 55 ],
+        "click" : true,
+        "touch" : true,
+        "order" : 5
+    },
+    "/input/system" : {
+        "type" : "button",
+        "side" : "left",
+        "binding_image_point" : [ 72, 39 ],
+        "click" : true,
+        "touch" : true,
+        "order" : 0
+    },
+    "/input/thumbrest": {
+        "type" : "button",
+        "binding_image_point" : [ 70, 65 ],
+        "click" : false,
+        "touch" : true
+    },
+    "/input/skeleton/right" : {
+        "type" : "skeleton",
+        "side" : "right",
+        "skeleton" : "/skeleton/hand/right",
+        "binding_image_point" : [ 11, 150 ]
+    },
+    "/input/skeleton/left" : {
+        "type" : "skeleton",
+        "side" : "left",
+        "skeleton" : "/skeleton/hand/left",
+        "binding_image_point" : [ 11, 150 ]
+    },
+    "/output/haptic" : {
+        "type" : "vibration",
+        "binding_image_point" : [ 72, 39 ]
+    },
+    "/pose/raw" : {
+        "type" : "pose",
+        "binding_image_point" : [ 14, 16 ]
+    },
+    "/pose/base" : {
+        "type" : "pose",
+        "binding_image_point" : [ 11, 150 ]
+    },
+    "/pose/handgrip" : {
+        "type" : "pose",
+        "binding_image_point" : [ 24, 86 ]
+    },
+    "/pose/tip" : {
+        "type" : "pose",
+        "binding_image_point" : [ 14, 16 ]
+    },
+    "/pose/openxr_aim" : {
+        "type" : "pose",
+        "binding_image_point" : [ 14, 16 ]
+    },
+    "/pose/openxr_grip" : {
+        "type" : "pose",
+        "binding_image_point" : [ 24, 86 ]
+    }
+  },
+  "mirror_mappings" :
+  [
+    ["/user/hand/left/input/x", "/user/hand/right/input/a"],
+    ["/user/hand/left/input/y", "/user/hand/right/input/b"]
+  ],
+  "simulation_settings":
+  {
+	"hmd_profile": "rift",
+    "left_modelnumber": "Oculus Quest2 (Left Controller)",
+    "right_modelnumber": "Oculus Quest2 (Right Controller)",
+    "left_serialnumber": "WMHD315M3010GV_Controller_Left",
+    "right_serialnumber": "WMHD315M3010GV_Controller_Right",
+    "left_rendermodel": "oculus_quest2_controller_left",
+    "right_rendermodel": "oculus_quest2_controller_right",
+	"left_registered_device_type": "oculus/WMHD315M3010GV_Controller_Left",
+	"right_registered_device_type": "oculus/WMHD315M3010GV_Controller_Right",
+    "tracking_system_name": "oculus",
+    "manufacturer_name": "Oculus",
+	"legacy_buttons": [0, 1, 2, 7, 32, 33, 34],
+	"legacy_axis": [2, 3, 3, 0, 0]
+  },
+  "default_bindings": [
+  {
+    "app_key": "openvr.component.vrcompositor",
+    "binding_url": "vrcompositor_bindings_touch.json"
+  }
+]
+}

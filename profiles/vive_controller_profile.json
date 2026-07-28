@@ -1,0 +1,123 @@
+{
+  "jsonid" : "input_profile",
+  "controller_type": "vive_controller",
+  "device_class" : "TrackedDeviceClass_Controller",
+  "resource_root" : "htc",
+  "driver_name" : "lighthouse",
+  "legacy_binding" :  "{htc}/input/legacy_bindings_vive_controller.json",
+  "remapping" :  "{htc}/input/vive_controller_remapping.json",
+  "input_bindingui_mode" : "controller_handed",
+  "should_show_binding_errors" :  true,
+  "input_bindingui_left" :
+  {
+    "transform" : "scale(-1,1)",
+    "image": "{htc}/icons/vive_wand.svg"
+  },
+  "input_bindingui_right" :
+  {
+    "image": "{htc}/icons/vive_wand.svg"
+  },
+  "input_source" :
+  {
+    "/input/trackpad" : {
+        "type" : "trackpad",
+	"click" : true,
+	"touch" : true,
+        "binding_image_point" : [ 66, 59 ],
+        "order" : 2
+    },
+    "/input/trigger" : {
+        "type" : "trigger",
+	"click" : true,
+	"value" : true,
+        "binding_image_point" : [ 41, 64 ],
+        "order" : 1
+    },
+    "/input/grip" : {
+        "type" : "button",
+	"click" : true,
+        "binding_image_point" : [ 52, 87 ],
+        "order" : 3
+    },
+    "/input/application_menu" : {
+        "type" : "button",
+	"click" : true,
+        "binding_image_point" : [ 64, 35 ],
+        "order" : 4
+    },
+    "/input/system" : {
+        "type" : "button",
+	"click" : true,
+        "binding_image_point" : [ 67, 81 ],
+        "order" : 5
+    },
+    "/input/skeleton/right" : {
+        "type" : "skeleton",
+	"side" : "right",
+	"skeleton" : "/skeleton/hand/right",
+        "binding_image_point" : [ 62, 16 ]
+    },
+    "/input/skeleton/left" : {
+        "type" : "skeleton",
+	"side" : "left",
+	"skeleton" : "/skeleton/hand/left",
+        "binding_image_point" : [ 62, 16 ]
+    },
+    "/pose/raw" : {
+        "type" : "pose",
+        "binding_image_point" : [ 62, 16 ]
+    },
+    "/pose/base" : {
+        "type" : "pose",
+        "binding_image_point" : [ 65, 150 ]
+    },
+    "/pose/handgrip" : {
+        "type" : "pose",
+        "binding_image_point" : [ 52, 86 ]
+    },
+    "/pose/grip" : {
+        "type" : "pose",
+        "binding_image_point" : [ 52, 86 ]
+    },
+    "/pose/openxr_handmodel" : {
+        "type" : "pose",
+        "binding_image_point" : [ 52, 86 ]
+    },
+    "/pose/openxr_handmodel_r" : {
+        "type" : "pose",
+        "binding_image_point" : [ 52, 86 ]
+    },
+    "/pose/tip" : {
+        "type" : "pose",
+        "binding_image_point" : [ 62, 16 ]
+    },
+    "/pose/front" : {
+        "type" : "pose",
+        "binding_image_point" : [ 62, 16 ]
+    },
+    "/pose/gdc2015" : {
+        "type" : "pose",
+        "binding_image_point" : [ 62, 16 ]
+    },
+    "/output/haptic" : {
+        "type" : "vibration",
+        "binding_image_point" : [ 66, 59 ]
+    }
+  },
+  "simulation_settings":
+  {
+	"hmd_profile": "vive",
+    "left_modelnumber": "VIVE Controller Pro MV",
+    "right_modelnumber": "VIVE Controller Pro MV",
+    "left_serialnumber": "LHR-00000001",
+    "right_serialnumber": "LHR-00000002",
+    "left_rendermodel": "vr_controller_vive_1_5",
+    "right_rendermodel": "vr_controller_vive_1_5",
+	"left_registered_device_type": "htc/vive_controllerLHR-00000001",
+	"right_registered_device_type": "htc/vive_controllerLHR-00000002",
+    "tracking_system_name": "lighthouse",
+    "manufacturer_name": "HTC",
+	"legacy_buttons": [0, 1, 2, 32, 33],
+	"legacy_axis": [1, 3, 0, 0, 0]
+  }
+}

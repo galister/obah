@@ -1,0 +1,119 @@
+{
+   "jsonid" : "input_profile",
+   "legacy_binding" : "config/legacy_bindings_generic.json",
+   "legacy_profile" : "none",
+   "controller_type" : "gamepad",
+   "device_class" : "TrackedDeviceClass_Controller",
+   "driver_name": "gamepad",
+   "input_bindingui_mode" : "single_device",
+   "input_bindingui_right" : {
+      "image" : "{gamepad}/icons/gamepad.svg"
+   },
+   "input_source" : {
+      "/input/a" : {
+         "binding_image_point" : [ 174,89 ],
+         "type" : "button",
+         "click": true,
+        "order" : 1
+      },
+      "/input/b" : {
+         "binding_image_point" : [ 192,73 ],
+         "type" : "button",
+         "click": true,
+          "order" : 2
+      },
+      "/input/back" : {
+         "binding_image_point" : [ 130, 75 ],
+         "type" : "button",
+         "click": true,
+         "order" : 16
+      },
+      "/input/dpad_down" : {
+         "binding_image_point" : [ 84, 117 ],
+         "type" : "button",
+         "click": true,
+          "order" : 11
+      },
+      "/input/dpad_left" : {
+         "binding_image_point" : [ 71, 106 ],
+         "type" : "button",
+         "click": true,
+         "order" : 13
+      },
+      "/input/dpad_right" : {
+         "binding_image_point" : [ 94, 106 ],
+         "type" : "button",
+         "click": true,
+          "order" : 14
+      },
+      "/input/dpad_up" : {
+         "binding_image_point" : [ 84, 97 ],
+         "type" : "button",
+         "click": true,
+         "order" : 12
+      },
+      "/input/guide" : {
+         "binding_image_point" : [ 113, 52 ],
+         "type" : "button",
+         "click": true,
+         "order" : 17
+      },
+      "/input/trigger_left" : {
+         "binding_image_point" : [ 49, 13 ],
+         "type" : "trigger",
+         "value" : true,
+         "order" : 7
+
+      },
+      "/input/trigger_right" : {
+         "binding_image_point" : [ 176, 13 ],
+         "type" : "trigger",
+         "value" : true,
+         "order" : 8
+
+      },
+      "/input/joystick_left" : {
+         "binding_image_point" : [ 52, 84 ],
+         "type" : "joystick",
+         "click": true,
+         "order" : 5
+      },
+      "/input/joystick_right" : {
+         "binding_image_point" : [ 145, 114 ],
+         "type" : "joystick",
+         "click": true,
+          "order" : 6
+      },
+      "/input/shoulder_left" : {
+         "binding_image_point" : [ 50, 28 ],
+         "type" : "button",
+         "click": true,
+         "order" : 9
+      },
+      "/input/shoulder_right" : {
+         "binding_image_point" : [ 177, 28 ],
+         "type" : "button",
+         "click": true,
+         "order" : 10
+      },
+      "/input/start" : {
+         "binding_image_point" : [ 94, 75 ],
+         "type" : "button",
+         "click": true,
+         "order" : 15
+      },
+      "/input/x" : {
+         "binding_image_point" : [ 159, 75 ],
+         "type" : "button",
+         "click": true,
+          "order" : 3
+      },
+      "/input/y" : {
+         "binding_image_point" : [ 175, 60 ],
+         "type" : "button",
+         "click": true,
+         "order" : 4
+
+      }
+   }
+}
