@@ -1,6 +1,13 @@
 use keyvalues_parser::{Obj, Vdf};
 use std::path::{Path, PathBuf};
 
+const MANIFEST_NAMES: &[&str] = &[
+    "actions.json",
+    "action_manifest.json",
+    "vr_actions.json",
+    "steamvr_actions.json",
+];
+
 #[derive(Clone, Debug)]
 pub struct AppManifest {
     pub name: String,
@@ -97,7 +104,10 @@ pub fn find_actions_json(game_path: &Path) -> Option<PathBuf> {
         for entry in entries.flatten() {
             let path = entry.path();
 
-            if path.file_name().map_or(false, |n| n == "actions.json") {
+            if path
+                .file_name()
+                .map_or(false, |n| MANIFEST_NAMES.iter().any(|m| n == *m))
+            {
                 return Some(path);
             }
 

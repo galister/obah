@@ -20,11 +20,13 @@ impl BindingSourceKind {
         match self {
             BindingSourceKind::Xrizer => {
                 let stripped = controller_type.replace('_', "");
-                game_folder.join("xrizer").join(format!("{}.json", stripped))
+                game_folder
+                    .join("xrizer")
+                    .join(format!("{}.json", stripped))
             }
-            BindingSourceKind::OpenComposite => {
-                game_folder.join("OpenComposite").join(format!("{}.json", controller_type))
-            }
+            BindingSourceKind::OpenComposite => game_folder
+                .join("OpenComposite")
+                .join(format!("{}.json", controller_type)),
             BindingSourceKind::Vapor => game_folder.join("vapor_binding.json"),
         }
     }
@@ -45,10 +47,7 @@ fn scan_xrizer(game_folder: &Path, out: &mut Vec<DiscoveredBinding>) {
         .map(|(name, _)| name.to_string())
         .collect();
 
-    let known_stripped: Vec<String> = known_types
-        .iter()
-        .map(|t| strip_underscores(t))
-        .collect();
+    let known_stripped: Vec<String> = known_types.iter().map(|t| strip_underscores(t)).collect();
 
     let entries = match std::fs::read_dir(&xrizer_dir) {
         Ok(e) => e,

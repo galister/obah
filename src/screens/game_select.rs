@@ -257,13 +257,11 @@ impl GameSelectScreen {
             }))
             .collect();
 
-        let list = List::new(items)
-            .block(block)
-            .highlight_style(
-                Style::default()
-                    .add_modifier(Modifier::BOLD)
-                    .bg(Color::DarkGray),
-            );
+        let list = List::new(items).block(block).highlight_style(
+            Style::default()
+                .add_modifier(Modifier::BOLD)
+                .bg(Color::DarkGray),
+        );
 
         frame.render_stateful_widget(list, chunks[1], &mut self.list_state);
 

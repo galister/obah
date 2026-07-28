@@ -4,11 +4,11 @@ use crate::sources::{self, BindingSourceKind};
 use crate::types::manifest::{ActionManifest, InputProfile};
 use crossterm::event::KeyCode;
 use ratatui::{
+    Frame,
     layout::{Alignment, Constraint, Direction, Layout},
     style::{Color, Modifier, Style},
     text::{Line, Span},
     widgets::{Block, Borders, List, ListItem, ListState, Paragraph},
-    Frame,
 };
 use std::collections::BTreeMap;
 use std::path::PathBuf;

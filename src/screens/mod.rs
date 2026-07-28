@@ -34,5 +34,8 @@ pub enum ScreenAction {
     None,
     GoBack,
     Quit,
-    ControllerSelected { controller_type: String, binding_source: BindingSourceSelection },
+    ControllerSelected {
+        controller_type: String,
+        binding_source: BindingSourceSelection,
+    },
 }

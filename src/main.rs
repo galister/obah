@@ -15,12 +15,12 @@ use std::path::Path;
 use std::time::Duration;
 
 use screens::{
-    Screen, ScreenAction, BindingSourceSelection, controller_type::ControllerTypeScreen, edit_bindings::EditBindingsScreen,
-    game_select::GameSelectScreen,
+    BindingSourceSelection, Screen, ScreenAction, controller_type::ControllerTypeScreen,
+    edit_bindings::EditBindingsScreen, game_select::GameSelectScreen,
 };
-use steam::AppManifest;
 use sources::BindingSourceKind;
 use std::path::PathBuf;
+use steam::AppManifest;
 
 fn resolve_binding_path(
     game_folder: &Path,
@@ -32,23 +32,73 @@ fn resolve_binding_path(
         BindingSourceSelection::Default => {
             let content = std::fs::read_to_string(actions_json_path).ok()?;
             let manifest: types::manifest::ActionManifest = serde_json::from_str(&content).ok()?;
-            let binding = manifest.default_bindings.iter().find(|b| b.controller_type == controller_type)?;
+            let binding = manifest
+                .default_bindings
+                .iter()
+                .find(|b| b.controller_type == controller_type)?;
             let path = actions_json_path.parent()?.join(&binding.binding_url);
             path.canonicalize().ok()
         }
         BindingSourceSelection::Xrizer => Some(
-            BindingSourceKind::Xrizer.save_path(game_folder, controller_type).canonicalize().ok()?,
+            BindingSourceKind::Xrizer
+                .save_path(game_folder, controller_type)
+                .canonicalize()
+                .ok()?,
         ),
         BindingSourceSelection::Vapor => Some(
-            BindingSourceKind::Vapor.save_path(game_folder, controller_type).canonicalize().ok()?,
+            BindingSourceKind::Vapor
+                .save_path(game_folder, controller_type)
+                .canonicalize()
+                .ok()?,
         ),
         BindingSourceSelection::OpenComposite => Some(
-            BindingSourceKind::OpenComposite.save_path(game_folder, controller_type)
+            BindingSourceKind::OpenComposite
+                .save_path(game_folder, controller_type)
                 .canonicalize()
                 .ok()?,
         ),
         BindingSourceSelection::Scratch => None,
     }
+}
+
+fn find_manifest_by_scanning(game_path: &Path) -> Option<PathBuf> {
+    const MAX_SIZE: u64 = 1_000_000;
+
+    fn recurse(current: &Path, depth: u32) -> Option<PathBuf> {
+        if depth > 10 {
+            return None;
+        }
+
+        let Ok(entries) = std::fs::read_dir(current) else {
+            return None;
+        };
+
+        for entry in entries.flatten() {
+            let path = entry.path();
+
+            if path.is_file()
+                && path.extension().map_or(false, |ext| ext == "json")
+                && path.metadata().map_or(false, |m| m.len() <= MAX_SIZE)
+            {
+                if let Ok(content) = std::fs::read_to_string(&path) {
+                    if serde_json::from_str::<types::manifest::ActionManifest>(&content).is_ok() {
+                        eprintln!("Found manifest: {}", path.display());
+                        return Some(path);
+                    }
+                }
+            }
+
+            if path.is_dir() {
+                if let Some(found) = recurse(&path, depth + 1) {
+                    return Some(found);
+                }
+            }
+        }
+
+        None
+    }
+
+    recurse(game_path, 0)
 }
 
 fn main() -> anyhow::Result<()> {
@@ -82,16 +132,25 @@ fn main() -> anyhow::Result<()> {
             std::process::exit(1);
         }
 
-        if let Some(actions_json) = steam::find_actions_json(&resolved_path) {
+        let actions_json = steam::find_actions_json(&resolved_path).or_else(|| {
+            eprintln!("No manifest found by name, searching JSON files...");
+            find_manifest_by_scanning(&resolved_path)
+        });
+
+        if let Some(actions_json) = actions_json {
             let game_name = resolved_path
                 .file_name()
                 .and_then(|n| n.to_str())
                 .unwrap_or(&args[1])
                 .to_string();
-            controller_type = Some(ControllerTypeScreen::new(actions_json, resolved_path, game_name));
+            controller_type = Some(ControllerTypeScreen::new(
+                actions_json,
+                resolved_path,
+                game_name,
+            ));
             current_screen = Screen::ControllerType;
         } else {
-            eprintln!("Error: no actions.json found in '{}'", args[1]);
+            eprintln!("Error: no action manifest found in '{}'", args[1]);
             std::process::exit(1);
         }
     } else {
@@ -140,14 +199,21 @@ fn main() -> anyhow::Result<()> {
                                 gs.handle_key(key.code);
 
                                 if key.code == KeyCode::Enter && gs.should_transition() {
-                            if let (Some(actions_path), Some(game_folder), Some(game_name)) = (
-                                gs.selected_actions_json_path(),
-                                gs.selected_game_folder(),
-                                gs.selected_game_name(),
-                            ) {
-                                controller_type =
-                                    Some(ControllerTypeScreen::new(actions_path, game_folder, game_name));
-                                current_screen = Screen::ControllerType;
+                                    if let (
+                                        Some(actions_path),
+                                        Some(game_folder),
+                                        Some(game_name),
+                                    ) = (
+                                        gs.selected_actions_json_path(),
+                                        gs.selected_game_folder(),
+                                        gs.selected_game_name(),
+                                    ) {
+                                        controller_type = Some(ControllerTypeScreen::new(
+                                            actions_path,
+                                            game_folder,
+                                            game_name,
+                                        ));
+                                        current_screen = Screen::ControllerType;
                                     }
                                 }
                             }
@@ -159,16 +225,24 @@ fn main() -> anyhow::Result<()> {
                                         controller_type = None;
                                         current_screen = Screen::GameSelect;
                                     }
-                                    ScreenAction::ControllerSelected { controller_type: ct_name, binding_source } => {
+                                    ScreenAction::ControllerSelected {
+                                        controller_type: ct_name,
+                                        binding_source,
+                                    } => {
                                         let game_name = ct.game_name().to_string();
-                                        let game_folder = ct.game_folder().cloned().unwrap_or_default();
+                                        let game_folder =
+                                            ct.game_folder().cloned().unwrap_or_default();
                                         let actions_path = ct
                                             .selected_actions_json_path()
                                             .cloned()
                                             .unwrap_or_default();
 
-                                        let binding_json_path =
-                                            resolve_binding_path(&game_folder, &ct_name, &binding_source, &actions_path);
+                                        let binding_json_path = resolve_binding_path(
+                                            &game_folder,
+                                            &ct_name,
+                                            &binding_source,
+                                            &actions_path,
+                                        );
 
                                         edit_bindings = Some(EditBindingsScreen::new_with_binding(
                                             ct_name,
@@ -185,14 +259,14 @@ fn main() -> anyhow::Result<()> {
                         }
                         Screen::EditBindings => {
                             if let Some(ref mut eb) = edit_bindings {
-                                 match eb.handle_key(key.code) {
-                                     ScreenAction::GoBack => {
-                                         edit_bindings = None;
-                                         current_screen = Screen::ControllerType;
-                                     }
-                                      ScreenAction::Quit => {
-                                          break 'main;
-                                     }
+                                match eb.handle_key(key.code) {
+                                    ScreenAction::GoBack => {
+                                        edit_bindings = None;
+                                        current_screen = Screen::ControllerType;
+                                    }
+                                    ScreenAction::Quit => {
+                                        break 'main;
+                                    }
                                     _ => {}
                                 }
                             }

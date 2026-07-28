@@ -11,11 +11,11 @@ use crate::types::{
 };
 use crossterm::event::KeyCode;
 use ratatui::{
+    Frame,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Line, Span},
     widgets::{Block, Borders, Clear, List, ListItem, ListState, Paragraph, Tabs, Wrap},
-    Frame,
 };
 use std::{
     collections::BTreeMap,
@@ -750,11 +750,7 @@ impl EditBindingsScreen {
     fn apply_binding_modal(&mut self, modal: SourceBindingModal) {
         let action_set_name =
             resolved_action_set_name(&self.binding.bindings, &modal.action_set_name);
-        let action_set = self
-            .binding
-            .bindings
-            .entry(action_set_name)
-            .or_default();
+        let action_set = self.binding.bindings.entry(action_set_name).or_default();
         let sources = action_set.sources_mut();
 
         let insert_at = sources
@@ -1021,11 +1017,7 @@ impl EditBindingsScreen {
             OtherBindingModal::Path(modal) => {
                 let action_set_name =
                     resolved_action_set_name(&self.binding.bindings, &modal.action_set_name);
-                let action_set = self
-                    .binding
-                    .bindings
-                    .entry(action_set_name)
-                    .or_default();
+                let action_set = self.binding.bindings.entry(action_set_name).or_default();
                 let bindings = path_bindings_mut(action_set, modal.kind);
                 match modal.original_index {
                     Some(index) if index < bindings.len() => {
@@ -1042,11 +1034,7 @@ impl EditBindingsScreen {
             OtherBindingModal::Chord(modal) => {
                 let action_set_name =
                     resolved_action_set_name(&self.binding.bindings, &modal.action_set_name);
-                let action_set = self
-                    .binding
-                    .bindings
-                    .entry(action_set_name)
-                    .or_default();
+                let action_set = self.binding.bindings.entry(action_set_name).or_default();
                 let bindings = action_set.chords_mut();
                 match modal.original_index {
                     Some(index) if index < bindings.len() => {
@@ -3794,12 +3782,11 @@ fn render_discard_dialog(frame: &mut Frame, screen_area: Rect) {
         ),
         Span::styled(
             " [Y]es ",
-            Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD),
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
         ),
-        Span::styled(
-            "[N]o ",
-            Style::default().fg(Color::White),
-        ),
+        Span::styled("[N]o ", Style::default().fg(Color::White)),
     ]))
     .alignment(Alignment::Center);
 
@@ -4548,10 +4535,7 @@ mod tests {
     #[test]
     fn action_set_lookup_ignores_case_and_trailing_slashes() {
         let mut bindings = BTreeMap::new();
-        bindings.insert(
-            "/actions/Main".to_owned(),
-            ActionSetBindings::default(),
-        );
+        bindings.insert("/actions/Main".to_owned(), ActionSetBindings::default());
 
         assert!(find_action_set_bindings(&bindings, "/actions/main/").is_some());
         assert_eq!(
@@ -4563,14 +4547,8 @@ mod tests {
     #[test]
     fn action_set_lookup_prefers_an_exact_key() {
         let mut bindings = BTreeMap::new();
-        bindings.insert(
-            "/actions/main".to_owned(),
-            ActionSetBindings::default(),
-        );
-        bindings.insert(
-            "/actions/Main".to_owned(),
-            ActionSetBindings::default(),
-        );
+        bindings.insert("/actions/main".to_owned(), ActionSetBindings::default());
+        bindings.insert("/actions/Main".to_owned(), ActionSetBindings::default());
 
         assert_eq!(
             resolved_action_set_name(&bindings, "/actions/Main"),

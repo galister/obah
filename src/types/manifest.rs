@@ -479,5 +479,3 @@ pub struct ProfileDefaultBinding {
     #[serde(flatten)]
     pub extra: ExtraFields,
 }
-
-
