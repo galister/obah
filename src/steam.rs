@@ -128,7 +128,7 @@ pub fn list_steamvr_games() -> anyhow::Result<Vec<AppManifest>> {
     let steam_root = get_steam_root()?;
     let library_path = steam_root.join("steamapps/libraryfolders.vdf");
     let vdf_data = std::fs::read_to_string(library_path)?;
-    let vdf_root = keyvalues_parser::Vdf::parse(&vdf_data)?;
+    let vdf_root = keyvalues_parser::parse(&vdf_data).map(|v| v.into_vdf())?;
 
     let Some(entries) = parse_libraryfolders(&vdf_root) else {
         anyhow::bail!("Failed to parse libraryfolders");
@@ -144,7 +144,7 @@ pub fn list_steamvr_games() -> anyhow::Result<Vec<AppManifest>> {
                 return None;
             };
 
-            let Ok(vdf_root) = keyvalues_parser::Vdf::parse(&vdf_data) else {
+            let Ok(vdf_root) = keyvalues_parser::parse(&vdf_data).map(|v| v.into_vdf()) else {
                 return None;
             };
 

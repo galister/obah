@@ -578,8 +578,9 @@ dependencies = [
 
 [[package]]
 name = "keyvalues-parser"
-version = "0.2.2"
-source = "git+https://codeberg.org/CosmicHarper/vdf-rs.git?rev=fc6dcbea9eb13cacb98dea40063f6f56cde6e145#fc6dcbea9eb13cacb98dea40063f6f56cde6e145"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "eded51a3b2cdcdc173e23683fd49f72e8151160b279f80c0378f7661a2ae10b7"
 dependencies = [
  "pest",
 ]
