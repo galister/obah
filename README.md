@@ -1,5 +1,6 @@
-OpenVR bindings are hard.
----
+# OpenVR bindings are hard.
+
+![Screenshot of obah TUI](https://github.com/galister/obah/blob/guide/tui.png?raw=true)
 
 We all know that, but maybe they don't have to be hard anymore.
 
