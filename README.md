@@ -12,7 +12,7 @@ AUR package: `obah-git`
 
 Via cargo:
 ```sh
-cargo install --git https://github.com/galister/obah.git
+cargo install obah
 ```
 
 Or grab the portable binary from Releases.
