@@ -1073,19 +1073,6 @@ impl EditBindingsScreen {
         list_utils::apply_selection(&mut self.chord_list_state, chord_selected, chord_len);
     }
 
-    pub fn binding(&self) -> &SteamVrBindingFile {
-        &self.binding
-    }
-
-    pub fn binding_mut(&mut self) -> &mut SteamVrBindingFile {
-        self.dirty = true;
-        &mut self.binding
-    }
-
-    pub fn is_dirty(&self) -> bool {
-        self.dirty
-    }
-
     fn save_binding(&mut self) {
         if let Some(path) = self.binding_path.clone() {
             if let Err(error) = self.save_binding_to(&path) {

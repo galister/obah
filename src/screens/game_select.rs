@@ -20,18 +20,6 @@ pub struct GameSelectScreen {
 }
 
 impl GameSelectScreen {
-    pub fn new() -> Self {
-        let mut list_state = ListState::default();
-        list_state.select(Some(0));
-        Self {
-            games: Vec::new(),
-            list_state,
-            loading: true,
-            error: None,
-            browse_path: None,
-        }
-    }
-
     pub fn start_loading() -> (Self, mpsc::Receiver<Result<Vec<AppManifest>, String>>) {
         let (tx, rx) = mpsc::channel();
 

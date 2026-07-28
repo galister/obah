@@ -190,10 +190,9 @@ fn main() -> anyhow::Result<()> {
                                          edit_bindings = None;
                                          current_screen = Screen::ControllerType;
                                      }
-                                     ScreenAction::Quit => {
-                                         edit_bindings = None;
-                                         break 'main;
-                                    }
+                                      ScreenAction::Quit => {
+                                          break 'main;
+                                     }
                                     _ => {}
                                 }
                             }

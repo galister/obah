@@ -34,10 +34,6 @@ macro_rules! string_enum {
                     Self::Other(value) => value,
                 }
             }
-
-            pub fn is_known(&self) -> bool {
-                !matches!(self, Self::Other(_))
-            }
         }
 
         impl AsRef<str> for $name {
@@ -295,12 +291,6 @@ pub struct SourceBinding {
     pub extra: ExtraFields,
 }
 
-impl SourceBinding {
-    pub fn parameters_mut(&mut self) -> &mut BindingParameters {
-        self.parameters.get_or_insert_with(BTreeMap::new)
-    }
-}
-
 string_enum! {
     pub enum BindingMode {
         Button => "button",
@@ -440,12 +430,6 @@ pub struct BindingUi {
 }
 
 impl InputProfile {
-    pub fn known_controller_types<'a>(
-        profiles: &'a [(&'a str, &'a [u8])],
-    ) -> std::collections::HashSet<&'a str> {
-        profiles.iter().map(|(name, _)| *name).collect()
-    }
-
     pub fn format_name_str(name: &str) -> String {
         name.split('_')
             .map(|word| {
@@ -496,35 +480,4 @@ pub struct ProfileDefaultBinding {
     pub extra: ExtraFields,
 }
 
-// steamvr commonly stores values such as "0.8" and "true" as json strings
-// so use these helpers instead of accessing directly
 
-pub fn parameter_f64(parameters: &BindingParameters, name: &str) -> Option<f64> {
-    match parameters.get(name)? {
-        Value::Number(value) => value.as_f64(),
-        Value::String(value) => value.parse().ok(),
-        _ => None,
-    }
-}
-
-pub fn parameter_bool(parameters: &BindingParameters, name: &str) -> Option<bool> {
-    match parameters.get(name)? {
-        Value::Bool(value) => Some(*value),
-        Value::String(value) if value.eq_ignore_ascii_case("true") => Some(true),
-        Value::String(value) if value.eq_ignore_ascii_case("false") => Some(false),
-        _ => None,
-    }
-}
-
-pub fn set_parameter_f64(parameters: &mut BindingParameters, name: impl Into<String>, value: f64) {
-    // Match SteamVR's commonly exported representation.
-    parameters.insert(name.into(), Value::String(value.to_string()));
-}
-
-pub fn set_parameter_bool(
-    parameters: &mut BindingParameters,
-    name: impl Into<String>,
-    value: bool,
-) {
-    parameters.insert(name.into(), Value::String(value.to_string()));
-}

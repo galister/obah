@@ -12,7 +12,6 @@ pub enum BindingSourceKind {
 #[derive(Debug, Clone)]
 pub struct DiscoveredBinding {
     pub controller_type: String,
-    pub path: PathBuf,
     pub kind: BindingSourceKind,
 }
 
@@ -71,7 +70,6 @@ fn scan_xrizer(game_folder: &Path, out: &mut Vec<DiscoveredBinding>) {
         if let Some(idx) = known_stripped.iter().position(|s| *s == stripped) {
             out.push(DiscoveredBinding {
                 controller_type: known_types[idx].clone(),
-                path,
                 kind: BindingSourceKind::Xrizer,
             });
         }
@@ -105,7 +103,6 @@ fn scan_open_composite(game_folder: &Path, out: &mut Vec<DiscoveredBinding>) {
         if known_types.contains(&filename.as_str()) {
             out.push(DiscoveredBinding {
                 controller_type: filename,
-                path,
                 kind: BindingSourceKind::OpenComposite,
             });
         }
@@ -130,7 +127,6 @@ fn scan_vapor(game_folder: &Path, out: &mut Vec<DiscoveredBinding>) {
 
     out.push(DiscoveredBinding {
         controller_type: binding.controller_type,
-        path: vapor_path,
         kind: BindingSourceKind::Vapor,
     });
 }

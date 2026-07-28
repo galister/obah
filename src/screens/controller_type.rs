@@ -229,9 +229,6 @@ impl ControllerTypeScreen {
             if avail.has_open_composite && idx == selected {
                 return BindingSourceSelection::OpenComposite;
             }
-            if avail.has_open_composite {
-                idx += 1;
-            }
 
             BindingSourceSelection::Scratch
         } else {
