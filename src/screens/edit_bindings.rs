@@ -712,10 +712,7 @@ impl EditBindingsScreen {
         };
         let action_set_name = action_set.name.clone();
 
-        let drafts = self
-            .binding
-            .bindings
-            .get(&action_set_name)
+        let drafts = find_action_set_bindings(&self.binding.bindings, &action_set_name)
             .map(ActionSetBindings::sources)
             .unwrap_or_default()
             .iter()
@@ -751,10 +748,12 @@ impl EditBindingsScreen {
     }
 
     fn apply_binding_modal(&mut self, modal: SourceBindingModal) {
+        let action_set_name =
+            resolved_action_set_name(&self.binding.bindings, &modal.action_set_name);
         let action_set = self
             .binding
             .bindings
-            .entry(modal.action_set_name)
+            .entry(action_set_name)
             .or_default();
         let sources = action_set.sources_mut();
 
@@ -1020,10 +1019,12 @@ impl EditBindingsScreen {
     fn apply_other_modal(&mut self, modal: OtherBindingModal, delete: bool) {
         match modal {
             OtherBindingModal::Path(modal) => {
+                let action_set_name =
+                    resolved_action_set_name(&self.binding.bindings, &modal.action_set_name);
                 let action_set = self
                     .binding
                     .bindings
-                    .entry(modal.action_set_name)
+                    .entry(action_set_name)
                     .or_default();
                 let bindings = path_bindings_mut(action_set, modal.kind);
                 match modal.original_index {
@@ -1039,10 +1040,12 @@ impl EditBindingsScreen {
                 }
             }
             OtherBindingModal::Chord(modal) => {
+                let action_set_name =
+                    resolved_action_set_name(&self.binding.bindings, &modal.action_set_name);
                 let action_set = self
                     .binding
                     .bindings
-                    .entry(modal.action_set_name)
+                    .entry(action_set_name)
                     .or_default();
                 let bindings = action_set.chords_mut();
                 match modal.original_index {
@@ -1511,7 +1514,7 @@ impl EditBindingsScreen {
 
     fn current_action_set_bindings(&self) -> Option<&ActionSetBindings> {
         let action_set = self.action_sets.get(self.selected_action_set_index)?;
-        self.binding.bindings.get(&action_set.name)
+        find_action_set_bindings(&self.binding.bindings, &action_set.name)
     }
 
     fn render_status(&self, frame: &mut Frame, area: Rect) {
@@ -3872,6 +3875,39 @@ fn resolve_binding_path(actions_json_path: &Path, binding_url: &str) -> PathBuf 
     }
 }
 
+fn action_set_names_match(left: &str, right: &str) -> bool {
+    left.trim_end_matches('/')
+        .eq_ignore_ascii_case(right.trim_end_matches('/'))
+}
+
+fn find_action_set_bindings<'a>(
+    bindings: &'a BTreeMap<String, ActionSetBindings>,
+    action_set_name: &str,
+) -> Option<&'a ActionSetBindings> {
+    bindings.get(action_set_name).or_else(|| {
+        bindings
+            .iter()
+            .find(|(name, _)| action_set_names_match(name, action_set_name))
+            .map(|(_, bindings)| bindings)
+    })
+}
+
+fn resolved_action_set_name(
+    bindings: &BTreeMap<String, ActionSetBindings>,
+    action_set_name: &str,
+) -> String {
+    bindings
+        .get_key_value(action_set_name)
+        .map(|(name, _)| name.clone())
+        .or_else(|| {
+            bindings
+                .keys()
+                .find(|name| action_set_names_match(name, action_set_name))
+                .cloned()
+        })
+        .unwrap_or_else(|| action_set_name.to_owned())
+}
+
 fn collect_source(
     path: &str,
     def: &InputSourceDef,
@@ -4516,4 +4552,42 @@ fn short_path(path: &str) -> &str {
     path.rsplit('/')
         .find(|part| !part.is_empty())
         .unwrap_or(path)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn action_set_lookup_ignores_case_and_trailing_slashes() {
+        let mut bindings = BTreeMap::new();
+        bindings.insert(
+            "/actions/Main".to_owned(),
+            ActionSetBindings::default(),
+        );
+
+        assert!(find_action_set_bindings(&bindings, "/actions/main/").is_some());
+        assert_eq!(
+            resolved_action_set_name(&bindings, "/actions/main/"),
+            "/actions/Main"
+        );
+    }
+
+    #[test]
+    fn action_set_lookup_prefers_an_exact_key() {
+        let mut bindings = BTreeMap::new();
+        bindings.insert(
+            "/actions/main".to_owned(),
+            ActionSetBindings::default(),
+        );
+        bindings.insert(
+            "/actions/Main".to_owned(),
+            ActionSetBindings::default(),
+        );
+
+        assert_eq!(
+            resolved_action_set_name(&bindings, "/actions/Main"),
+            "/actions/Main"
+        );
+    }
 }
