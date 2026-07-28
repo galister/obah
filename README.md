@@ -4,9 +4,7 @@
 
 We all know that, but maybe they don't have to be hard anymore.
 
-This lightweight TUI will save you from having to descend into JSON hell.
-
-With modern features such as arrow key support and Enter key support, anyone can do their bindings without opening a text file!
+With cutting-edge features such as arrow key support, this lightweight TUI will save you from having to descend into JSON hell!
 
 ## Installation
 
