@@ -10,6 +10,10 @@ pub const INPUT_PROFILES_BYTES: &[(&str, &[u8])] = &[
         include_bytes!("../profiles/index_controller_profile.json"),
     ),
     (
+        "frame_controller",
+        include_bytes!("../profiles/frame_controller_profile.json"),
+    ),
+    (
         "oculus_touch",
         include_bytes!("../profiles/touch_profile.json"),
     ),
