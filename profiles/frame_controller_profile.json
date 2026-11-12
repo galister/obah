@@ -1,0 +1,288 @@
+{
+  "jsonid": "input_profile",
+  "controller_type": "frame_controller",
+  "device_class": "TrackedDeviceClass_Controller",
+  "resource_root": "frame_controller",
+  "driver_name": "frame_controller",
+  "legacy_binding": "{frame_controller}/input/legacy_bindings_frame_controller.json",
+  "remapping": "{frame_controller}/input/frame_controller_remapping.json",
+  "input_bindingui_mode": "controller_handed",
+  "should_show_binding_errors": true,
+  "input_bindingui_left": {
+    "image": "{frame_controller}/icons/frame_controller_left.svg"
+  },
+  "input_bindingui_right": {
+    "image": "{frame_controller}/icons/frame_controller_right.svg"
+  },
+  "mirror_mappings": [
+    [
+      "/user/hand/left/input/view",
+      "/user/hand/right/input/menu"
+    ],
+    [
+      "/user/hand/left/input/dpad_up",
+      "/user/hand/right/input/y"
+    ],
+    [
+      "/user/hand/left/input/dpad_right",
+      "/user/hand/right/input/b"
+    ],
+    [
+      "/user/hand/left/input/dpad_down",
+      "/user/hand/right/input/a"
+    ],
+    [
+      "/user/hand/left/input/dpad_left",
+      "/user/hand/right/input/x"
+    ]
+  ],
+  "input_source": {
+    "/input/system": {
+      "type": "button",
+      "click": true,
+      "touch": true,
+      "binding_image_point": [
+        69,
+        53
+      ],
+      "order": 1
+    },
+    "/input/menu": {
+      "type": "button",
+      "side": "right",
+      "click": true,
+      "touch": true,
+      "binding_image_point": [
+        46,
+        25
+      ],
+      "order": 2
+    },
+    "/input/view": {
+      "type": "button",
+      "side": "left",
+      "click": true,
+      "touch": true,
+      "binding_image_point": [
+        46,
+        25
+      ],
+      "order": 2
+    },
+    "/input/a": {
+      "type": "button",
+      "side": "right",
+      "click": true,
+      "touch": true,
+      "binding_image_point": [
+        67,
+        36
+      ],
+      "order": 6
+    },
+    "/input/b": {
+      "type": "button",
+      "side": "right",
+      "click": true,
+      "touch": true,
+      "binding_image_point": [
+        65,
+        24
+      ],
+      "order": 7
+    },
+    "/input/x": {
+      "type": "button",
+      "side": "right",
+      "click": true,
+      "touch": true,
+      "binding_image_point": [
+        58,
+        32
+      ],
+      "order": 8
+    },
+    "/input/y": {
+      "type": "button",
+      "side": "right",
+      "click": true,
+      "touch": true,
+      "binding_image_point": [
+        56,
+        20
+      ],
+      "order": 9
+    },
+    "/input/dpad_up": {
+      "type": "button",
+      "side": "left",
+      "click": true,
+      "touch": true,
+      "binding_image_point": [
+        56,
+        20
+      ],
+      "order": 13
+    },
+    "/input/dpad_right": {
+      "type": "button",
+      "side": "left",
+      "click": true,
+      "touch": true,
+      "binding_image_point": [
+        59,
+        32
+      ],
+      "order": 12
+    },
+    "/input/dpad_down": {
+      "type": "button",
+      "side": "left",
+      "click": true,
+      "touch": true,
+      "binding_image_point": [
+        67,
+        35
+      ],
+      "order": 10
+    },
+    "/input/dpad_left": {
+      "type": "button",
+      "side": "left",
+      "click": true,
+      "touch": true,
+      "binding_image_point": [
+        65,
+        24
+      ],
+      "order": 11
+    },
+    "/input/bumper": {
+      "type": "button",
+      "click": true,
+      "touch": true,
+      "binding_image_point": [
+        16,
+        32
+      ],
+      "order": 4
+    },
+    "/input/trigger": {
+      "type": "trigger",
+      "value": true,
+      "click": true,
+      "touch": true,
+      "binding_image_point": [
+        5,
+        43
+      ],
+      "order": 3
+    },
+    "/input/grip": {
+      "type": "trigger",
+      "click": true,
+      "value": true,
+      "touch": true,
+      "binding_image_point": [
+        43,
+        83
+      ],
+      "order": 14
+    },
+    "/input/thumbstick": {
+      "type": "joystick",
+      "click": true,
+      "touch": true,
+      "binding_image_point": [
+        60,
+        44
+      ],
+      "order": 5
+    },
+    "/input/thumbrest": {
+      "type": "button",
+      "click": false,
+      "touch": true,
+      "visibility" : "InputValueVisibility_SteamVRInternal",
+      "binding_image_point": [
+        52,
+        63
+      ],
+      "order": 100
+    },
+    "/pose/raw": {
+      "type": "pose",
+      "binding_image_point": [
+        36,
+        13
+      ]
+    },
+    "/pose/base": {
+      "type": "pose",
+      "binding_image_point": [
+        51,
+        150
+      ]
+    },
+    "/pose/handgrip": {
+      "type": "pose",
+      "binding_image_point": [
+        66,
+        86
+      ]
+    },
+    "/pose/tip": {
+      "type": "pose",
+      "binding_image_point": [
+        36,
+        13
+      ]
+    },
+    "/pose/gdc2015": {
+      "type": "pose",
+      "binding_image_point": [
+        36,
+        13
+      ]
+    },
+    "/pose/openxr_grip": {
+      "type": "pose",
+      "binding_image_point": [
+        66,
+        86
+      ]
+    },
+    "/pose/openxr_aim": {
+      "type": "pose",
+      "binding_image_point": [
+        36,
+        13
+      ]
+    },
+    "/input/skeleton/left": {
+      "type": "skeleton",
+      "skeleton": "/skeleton/hand/left",
+      "side": "left",
+      "binding_image_point": [
+        66,
+        86
+      ]
+    },
+    "/input/skeleton/right": {
+      "type": "skeleton",
+      "skeleton": "/skeleton/hand/right",
+      "side": "right",
+      "binding_image_point": [
+        66,
+        86
+      ]
+    },
+    "/output/haptic": {
+      "type": "vibration",
+      "binding_image_point": [
+        66,
+        86
+      ]
+    }
+  }
+}
